@@ -217,6 +217,9 @@ input:focus,select:focus,textarea:focus{outline:3px solid color-mix(in srgb,var(
 details summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}
 code{background:#efe6d0;padding:1px 6px;border-radius:6px;word-break:break-all}
 
+.modal-bg{position:fixed;inset:0;z-index:300;background:rgba(43,36,24,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--card);border:2.5px solid var(--edge);border-radius:16px;box-shadow:0 6px 0 var(--edge);padding:20px 22px;max-width:480px;width:100%;font-size:1.05rem}
+.modal .row{margin-top:16px}
 #toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:200;background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;max-width:calc(100% - 32px);text-align:center}
 #toast.show{opacity:1}
 
@@ -264,6 +267,21 @@ const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-mot
 const fmtTime = t => { if (!t) return ''; const d = new Date(t); return d.toLocaleString('ko-KR', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}); };
 const DEVICE = LS.get('hd:device') || (() => { const d = Math.random().toString(36).slice(2, 10); LS.set('hd:device', d); return d; })();
 let toastT;
+/* 브라우저 확인창 대신 쓰는 화면 안 확인 창 (미리보기 환경에서도 작동) */
+function ask(msg, okLabel = '확인'){
+  return new Promise(res => {
+    const d = document.createElement('div');
+    d.className = 'modal-bg';
+    d.innerHTML = `<div class="modal" role="alertdialog" aria-modal="true"><p>${esc(msg).replace(/\n/g, '<br>')}</p>
+      <div class="row" style="justify-content:flex-end"><button class="btn" data-m="0">취소</button><button class="btn primary" data-m="1">${esc(okLabel)}</button></div></div>`;
+    const done = v => { d.remove(); document.removeEventListener('keydown', key); res(v); };
+    const key = e => { if (e.key === 'Escape') done(false); };
+    d.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) done(b.dataset.m === '1'); else if (e.target === d) done(false); });
+    document.addEventListener('keydown', key);
+    document.body.appendChild(d);
+    d.querySelector('[data-m="1"]').focus();
+  });
+}
 function toast(msg, ms = 2600){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms); }
 
 /* ============ 시대·단원 ============ */
@@ -450,7 +468,7 @@ async function join(name, group, code){
   const key = keyOf(group, name);
   const rec = room.subs && room.subs[key];
   if (rec && rec.device && rec.device !== DEVICE && Date.now() - (rec.updatedAt || 0) < 20 * 60 * 1000){
-    if (!confirm(`${group}모둠에 '${name}' 학생이 이미 활동 중이에요.\n내가 맞으면 [확인], 다른 친구라면 [취소]를 누르고 이름 뒤에 번호를 붙여 주세요.`)) return;
+    if (!await ask(`${group}모둠에 '${name}' 학생이 이미 활동 중이에요.\n내가 맞으면 [확인], 다른 친구라면 [취소]를 누르고 이름 뒤에 번호를 붙여 주세요.`)) return;
   }
   S.code = code; S.room = room; S.me = {name, group:+group, key};
   LS.set('hd:me', {name, group:+group, code});
@@ -927,14 +945,14 @@ async function saveSetup(form){
   if (!d.title.trim()) return toast('세트 제목을 적어 주세요.');
   if (!/^[A-Z0-9]{3,6}$/.test(code)) return toast('수업 코드는 영어 대문자·숫자 3~6자예요.');
   if (!/^\d{4}$/.test(pin)) return toast('비밀번호는 숫자 4자리로 정해 주세요.');
-  if (!d.cards.some(c => c.trap) && !confirm('함정 카드가 없어요. 이대로 저장할까요?')) return;
+  if (!d.cards.some(c => c.trap) && !await ask('함정 카드가 없어요. 이대로 저장할까요?')) return;
   d.answer = d.cards.filter(c => !c.trap).map(c => c.id);
   let existing;
   try{ existing = await Store.getRoom(code); }catch(e){ return toast('인터넷 연결을 확인해 주세요.'); }
   if (existing && existing.meta && existing.meta.pinHash !== hash(pin)) return toast(m.existing ? '비밀번호가 맞지 않아요.' : '이미 사용 중인 수업 코드예요. 다른 코드를 써 주세요.');
   if (existing && existing.subs && Object.keys(existing.subs).length && existing.set){
     const changed = JSON.stringify(existing.set.cards.map(c => c.id).sort()) !== JSON.stringify(d.cards.map(c => c.id).sort()) || JSON.stringify(existing.set.answer) !== JSON.stringify(d.answer);
-    if (changed && !confirm('이미 학생 기록이 있어요. 카드나 순서를 바꾸면 학생들의 결과 색이 달라질 수 있어요. 저장할까요?')) return;
+    if (changed && !await ask('이미 학생 기록이 있어요. 카드나 순서를 바꾸면 학생들의 결과 색이 달라질 수 있어요. 저장할까요?')) return;
   }
   try{
     await Store.put(code, ['meta'], {title:d.title, createdAt:(existing && existing.meta && existing.meta.createdAt) || Date.now(), classSize, pinHash:hash(pin)});
@@ -1089,7 +1107,7 @@ function exportCSV(){
 
 /* 예시 학생 데이터 (대시보드 미리보기용, 이름은 '예시 학생') */
 async function fillSample(){
-  if (!confirm('예시 학생 26명의 기록을 만들어 대시보드를 미리 볼까요? [학생 기록 모두 지우기]로 언제든 지울 수 있어요.')) return;
+  if (!await ask('예시 학생 26명의 기록을 만들어 대시보드를 미리 볼까요? [학생 기록 모두 지우기]로 언제든 지울 수 있어요.')) return;
   const set = S.room.set, ans = set.answer, traps = set.cards.filter(c => c.trap).map(c => c.id), nm = id => cardOf(set, id).name;
   const tmpl = [
     (a, b) => `${a} 때문에 상황이 크게 바뀌었고, 그 결과 ${b}(으)로 이어졌다고 생각한다.`,
@@ -1132,7 +1150,7 @@ const ACT = {
   fillCode: b => { const f = app.querySelector('[data-form=openDash]'); f.code.value = b.dataset.code; f.pin.focus(); },
   newSetup: () => { newDraft(); go('setup'); },
   editSet: () => { newDraft(S.room.set, {code:S.teacher.code, pin:S.teacher.pin, classSize:(S.room.meta && S.room.meta.classSize) || 28, existing:true}); go('setup'); },
-  loadDefault: () => { if (!confirm('지금 입력한 카드를 기본 예시 세트로 바꿀까요?')) return; const id = S.draft.id; S.draft = defaultSet(); S.draft.id = id; render(); },
+  loadDefault: async () => { if (!await ask('지금 입력한 카드를 기본 예시 세트로 바꿀까요?')) return; const id = S.draft.id; S.draft = defaultSet(); S.draft.id = id; render(); },
   saveLib: () => {
     const lib = LS.get('hd:sets', []).filter(s => s.id !== S.draft.id);
     lib.unshift(JSON.parse(JSON.stringify(S.draft))); LS.set('hd:sets', lib.slice(0, 20)); toast('내 보관함에 저장했어요.'); render();
@@ -1143,7 +1161,7 @@ const ACT = {
     d.cards.push({id:'c' + n, name:'', year:'', desc:'', hint:'', trap:false}); render();
     const inputs = app.querySelectorAll('[data-cf$=":name"]'); inputs[inputs.length - 1].focus();
   },
-  cdel: b => { const d = S.draft; if (d.cards.length <= 6 && !confirm('카드가 6장보다 적어지면 저장할 수 없어요. 그래도 지울까요?')) return; d.cards.splice(+b.dataset.i, 1); render(); },
+  cdel: async b => { const d = S.draft; if (d.cards.length <= 6 && !await ask('카드가 6장보다 적어지면 저장할 수 없어요. 그래도 지울까요?')) return; d.cards.splice(+b.dataset.i, 1); render(); },
   cup: b => { const i = +b.dataset.i, c = S.draft.cards; if (i > 0){ [c[i-1], c[i]] = [c[i], c[i-1]]; render(); } },
   cdown: b => { const i = +b.dataset.i, c = S.draft.cards; if (i < c.length - 1){ [c[i+1], c[i]] = [c[i], c[i+1]]; render(); } },
   // 학생
@@ -1171,7 +1189,7 @@ const ACT = {
   copyLink: () => { navigator.clipboard && navigator.clipboard.writeText(studentLink()).then(() => toast('학생용 주소를 복사했어요.'), () => toast('복사하지 못했어요. 주소를 직접 선택해 복사해 주세요.')); },
   sample: () => fillSample(),
   resetRoom: async () => {
-    if (!confirm('이 수업의 학생 이름·도미노·별 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
+    if (!await ask('이 수업의 학생 이름·도미노·별 기록을 모두 지울까요? 되돌릴 수 없어요.')) return;
     try{ await Store.put(S.teacher.code, ['subs'], null); await Store.put(S.teacher.code, ['votes'], null); }catch(e){ return toast('인터넷 연결을 확인해 주세요.'); }
     await refreshRoom(); render(); toast('학생 기록을 지웠어요.');
   }
@@ -1199,7 +1217,7 @@ app.addEventListener('input', e => {
   if (t.dataset.cf && t.type !== 'checkbox'){ const [i, f] = t.dataset.cf.split(':'); S.draft.cards[+i][f] = t.value; if (f === 'name') updateOrderPreview(); return; }
   if (t.dataset.df === 'title' || t.dataset.df === 'unit'){ S.draft[t.dataset.df] = t.value; }
 });
-app.addEventListener('change', e => {
+app.addEventListener('change', async e => {
   const t = e.target;
   if (t.dataset.cf && t.type === 'checkbox'){ const [i] = t.dataset.cf.split(':'); S.draft.cards[+i].trap = t.checked; render(); return; }
   if (t.dataset.df === 'unitSel'){
@@ -1209,7 +1227,7 @@ app.addEventListener('change', e => {
   }
   if (t.dataset.df === 'era'){ S.draft.era = t.value; applyEra(t.value); return; }
   if (t.dataset.actChange === 'loadLib' && t.value !== ''){
-    const s = LS.get('hd:sets', [])[+t.value]; if (s && confirm(`「${s.title}」 세트를 불러올까요?`)){ S.draft = JSON.parse(JSON.stringify(s)); render(); } else t.value = '';
+    const s = LS.get('hd:sets', [])[+t.value]; if (s && await ask(`「${s.title}」 세트를 불러올까요?`)){ S.draft = JSON.parse(JSON.stringify(s)); render(); } else t.value = '';
     return;
   }
   if (t.dataset.dt){ S.dash[t.dataset.dt] = t.type === 'checkbox' ? t.checked : t.value; render(); }
