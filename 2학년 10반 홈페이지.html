@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2학년 10반 학급 홈페이지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mint: #2ed3a0;
+    --mint-dark: #13a97b;
+    --mint-soft: #e3fbf2;
+    --lime: #b8f05a;
+    --sky: #5cc8ff;
+    --sky-soft: #e6f6ff;
+    --sun: #ffd43b;
+    --sun-soft: #fff8d6;
+    --peach: #ff8fa3;
+    --peach-soft: #ffeef1;
+    --ink: #24323a;
+    --ink-soft: #66757d;
+    --line: #e4ece9;
+    --bg: #f5fbf8;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- 상단 네비게이션 ---------- */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px; gap: 12px;
+  }
+  .mini-logo { font-family: 'Jua', sans-serif; font-size: 20px; color: var(--mint-dark); white-space: nowrap; }
+  .nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a {
+    padding: 6px 12px; border-radius: 999px; font-size: 14px; font-weight: 500;
+    color: var(--ink-soft); white-space: nowrap; transition: .2s;
+  }
+  .nav a:hover, .nav a.active { background: var(--mint-soft); color: var(--mint-dark); }
+
+  /* ---------- 히어로 + 중앙 검색창 ---------- */
+  .hero {
+    background:
+      radial-gradient(circle at 12% 30%, rgba(255,212,59,.35) 0 90px, transparent 91px),
+      radial-gradient(circle at 88% 70%, rgba(92,200,255,.30) 0 120px, transparent 121px),
+      linear-gradient(135deg, #dcfff0 0%, #f0ffe0 50%, #e2f5ff 100%);
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+  .logo {
+    font-family: 'Jua', sans-serif;
+    font-size: clamp(40px, 8vw, 64px);
+    line-height: 1.1;
+    color: var(--mint-dark);
+    letter-spacing: -1px;
+  }
+  .logo span { color: var(--sky); }
+  .logo .dot { color: var(--sun); text-shadow: 0 2px 0 #f0b400; }
+  .slogan { margin-top: 8px; color: var(--ink-soft); font-size: 15px; }
+
+  .search {
+    margin: 28px auto 0;
+    max-width: 640px;
+    display: flex; align-items: center;
+    background: #fff;
+    border: 3px solid var(--mint);
+    border-radius: 999px;
+    padding: 4px 4px 4px 22px;
+    box-shadow: 0 8px 24px rgba(46,211,160,.18);
+  }
+  .search input {
+    flex: 1; min-width: 0; border: 0; outline: 0;
+    font-size: 17px; font-family: inherit; background: transparent; padding: 10px 0;
+  }
+  .search button {
+    border: 0; cursor: pointer;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--mint); color: #fff; font-size: 20px;
+    display: grid; place-items: center; transition: .2s;
+  }
+  .search button:hover { background: var(--mint-dark); }
+  .search-msg { margin-top: 10px; font-size: 14px; min-height: 22px; color: var(--mint-dark); font-weight: 500; }
+
+  /* 바로가기 아이콘 줄 */
+  .shortcuts {
+    margin: 22px auto 0;
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 22px;
+    max-width: 680px;
+  }
+  .shortcut { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); }
+  .shortcut i {
+    font-style: normal; width: 52px; height: 52px; border-radius: 18px;
+    display: grid; place-items: center; font-size: 24px;
+    background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.06);
+    transition: transform .2s;
+  }
+  .shortcut:hover i { transform: translateY(-4px) rotate(-4deg); }
+
+  /* ---------- 본문 ---------- */
+  main .wrap {
+    display: grid; grid-template-columns: 1fr 340px; gap: 20px;
+    padding-top: 28px; padding-bottom: 48px;
+  }
+  .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .card {
+    background: var(--card); border-radius: 20px; padding: 22px;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 10px rgba(36,50,58,.04);
+    scroll-margin-top: 70px;
+    transition: box-shadow .3s, outline-color .3s;
+    outline: 3px solid transparent;
+  }
+  .card.hit { outline-color: var(--sun); box-shadow: 0 0 0 6px rgba(255,212,59,.25); }
+  .card h2 {
+    font-family: 'Jua', sans-serif; font-weight: 400; font-size: 22px;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  .card h2 .tag { font-family: 'Noto Sans KR'; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; margin-left: auto; }
+
+  /* 학급 소개 */
+  .intro-top { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .badge-big {
+    width: 96px; height: 96px; border-radius: 28px; flex: none;
+    background: linear-gradient(135deg, var(--mint), var(--lime));
+    color: #fff; font-family: 'Jua'; font-size: 30px; line-height: 1;
+    display: grid; place-items: center; text-align: center;
+    box-shadow: 0 6px 16px rgba(46,211,160,.35);
+  }
+  .badge-big small { display: block; font-size: 14px; margin-top: 4px; }
+  .intro-text { flex: 1; min-width: 220px; }
+  .motto { font-family: 'Jua'; font-size: 20px; color: var(--mint-dark); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+  .stat { border-radius: 14px; padding: 12px 6px; text-align: center; }
+  .stat b { display: block; font-family: 'Jua'; font-size: 22px; font-weight: 400; }
+  .stat span { font-size: 12px; color: var(--ink-soft); }
+  .s1 { background: var(--mint-soft); } .s1 b { color: var(--mint-dark); }
+  .s2 { background: var(--sky-soft); } .s2 b { color: #1f9bd6; }
+  .s3 { background: var(--sun-soft); } .s3 b { color: #d39b00; }
+  .s4 { background: var(--peach-soft); } .s4 b { color: #e0566f; }
+  .rules { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .rules li { list-style: none; background: var(--bg); border: 1px dashed var(--mint); padding: 6px 12px; border-radius: 999px; font-size: 13px; }
+
+  /* 주간 학습 일정 */
+  .week-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .week-tabs button {
+    border: 0; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 700;
+    padding: 6px 14px; border-radius: 999px; background: var(--bg); color: var(--ink-soft);
+  }
+  .week-tabs button.on { background: var(--mint); color: #fff; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: separate; border-spacing: 4px; min-width: 520px; table-layout: fixed; font-size: 14px; }
+  th { font-weight: 700; padding: 8px 4px; border-radius: 10px; background: var(--mint-soft); color: var(--mint-dark); }
+  th.today { background: var(--sun); color: var(--ink); }
+  td { text-align: center; padding: 9px 4px; border-radius: 10px; background: #fafdfc; }
+  th:first-child { width: 56px; }
+  td.period { background: transparent; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+  td.today { background: var(--sun-soft); font-weight: 700; }
+  .sch-note { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+  .sch-note span { padding: 4px 10px; border-radius: 8px; background: var(--sky-soft); }
+
+  /* 공지사항 */
+  .notice-list { list-style: none; }
+  .notice-list li { border-bottom: 1px solid var(--line); }
+  .notice-list li:last-child { border-bottom: 0; }
+  .notice-list button {
+    width: 100%; text-align: left; border: 0; background: none; cursor: pointer;
+    font-family: inherit; color: inherit; padding: 12px 0; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .label { flex: none; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-top: 3px; }
+  .l-red { background: var(--peach-soft); color: #e0566f; }
+  .l-blue { background: var(--sky-soft); color: #1f9bd6; }
+  .l-green { background: var(--mint-soft); color: var(--mint-dark); }
+  .n-title { font-weight: 500; font-size: 15px; }
+  .n-date { display: block; font-size: 12px; color: var(--ink-soft); }
+  .n-body { display: none; font-size: 14px; color: var(--ink-soft); background: var(--bg); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .notice-list li.open .n-body { display: block; }
+
+  /* 선생님 한마디 */
+  .teacher { background: linear-gradient(160deg, #fffbe6, #fff); border-color: #ffe98a; }
+  .teacher-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--sun); display: grid; place-items: center; font-size: 30px; flex: none; }
+  .teacher-head b { display: block; }
+  .teacher-head small { color: var(--ink-soft); }
+  .bubble {
+    position: relative; background: #fff; border: 2px solid var(--sun); border-radius: 18px;
+    padding: 14px 16px; font-size: 15px;
+  }
+  .bubble::before {
+    content: ''; position: absolute; top: -10px; left: 22px;
+    border: 8px solid transparent; border-bottom-color: var(--sun); border-top: 0;
+  }
+  .cheer { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
+  .cheer button {
+    border: 0; cursor: pointer; font-family: inherit; font-weight: 700; font-size: 14px;
+    background: var(--peach); color: #fff; padding: 8px 16px; border-radius: 999px; transition: transform .15s;
+  }
+  .cheer button:active { transform: scale(.92); }
+  .cheer span { font-size: 13px; color: var(--ink-soft); }
+
+  /* 오늘의 정보 위젯 */
+  .today-card { background: linear-gradient(135deg, var(--sky), var(--mint)); color: #fff; border: 0; }
+  .today-card h2 { color: #fff; }
+  .d-day { font-family: 'Jua'; font-size: 40px; line-height: 1; }
+  .today-card p { opacity: .95; font-size: 14px; }
+
+  footer { text-align: center; padding: 24px 16px 40px; color: var(--ink-soft); font-size: 13px; border-top: 1px solid var(--line); background: #fff; }
+
+  @media (max-width: 860px) {
+    main .wrap { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 520px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .hero { padding: 40px 0 28px; }
+    .mini-logo { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 상단 네비게이션 -->
+<header class="topbar">
+  <div class="wrap">
+    <a href="#" class="mini-logo">🌱 2-10</a>
+    <nav class="nav">
+      <a href="#intro" class="active">학급소개</a>
+      <a href="#schedule">주간일정</a>
+      <a href="#notice">공지사항</a>
+      <a href="#teacher">선생님 한마디</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 중앙 로고 + 검색창 -->
+<section class="hero">
+  <div class="wrap">
+    <h1 class="logo">2학년 <span>10반</span><span class="dot">!</span></h1>
+    <p class="slogan">우리가 함께 자라는 초록빛 교실 🌿</p>
+
+    <form class="search" id="searchForm" role="search">
+      <input id="q" type="text" placeholder="공지, 과목, 일정을 검색해 보세요 (예: 수학, 체육대회)" autocomplete="off">
+      <button type="submit" aria-label="검색">🔍</button>
+    </form>
+    <p class="search-msg" id="searchMsg"></p>
+
+    <div class="shortcuts">
+      <a class="shortcut" href="#intro"><i>🏫</i>학급소개</a>
+      <a class="shortcut" href="#schedule"><i>📅</i>시간표</a>
+      <a class="shortcut" href="#notice"><i>📢</i>공지</a>
+      <a class="shortcut" href="#teacher"><i>💌</i>선생님</a>
+      <a class="shortcut" href="#today"><i>⏰</i>D-day</a>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+    <!-- 왼쪽 큰 칸 -->
+    <div class="col">
+
+      <section class="card" id="intro">
+        <h2>🏫 학급 소개</h2>
+        <div class="intro-top">
+          <div class="badge-big">2-10<small>새싹반</small></div>
+          <div class="intro-text">
+            <p class="motto">"서로 웃고, 함께 크자!"</p>
+            <p>우리 2학년 10반은 서로를 존중하고, 실수해도 다시 도전하는 반이에요.
+              공부도 놀이도 함께할 때 더 즐겁다는 걸 믿어요. 매일 한 번씩 친구에게 고마운 말을 건네는 것이 우리 반의 작은 전통이랍니다.</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat s1"><b>28명</b><span>우리 반 친구들</span></div>
+          <div class="stat s2"><b>2층</b><span>교실 위치</span></div>
+          <div class="stat s3"><b>🌻</b><span>반 상징 꽃</span></div>
+          <div class="stat s4"><b>4개</b><span>모둠</span></div>
+        </div>
+        <ul class="rules">
+          <li>🙌 먼저 인사하기</li>
+          <li>👂 끝까지 듣기</li>
+          <li>⏰ 시간 약속 지키기</li>
+          <li>🧹 내 자리 내가 정리</li>
+        </ul>
+      </section>
+
+      <section class="card" id="schedule">
+        <h2>📅 주간 학습 일정 <span class="tag" style="background:var(--sky-soft);color:#1f9bd6" id="weekLabel"></span></h2>
+        <div class="week-tabs" id="weekTabs">
+          <button data-w="0" class="on">이번 주</button>
+          <button data-w="1">다음 주</button>
+        </div>
+        <div class="table-scroll">
+          <table id="timetable"></table>
+        </div>
+        <div class="sch-note" id="schNote"></div>
+      </section>
+
+    </div>
+
+    <!-- 오른쪽 사이드 -->
+    <aside class="col">
+
+      <section class="card today-card" id="today">
+        <h2>⏰ 다가오는 일정</h2>
+        <div class="d-day" id="dday">D-?</div>
+        <p id="ddayText">2학기 기말고사까지</p>
+      </section>
+
+      <section class="card" id="notice">
+        <h2>📢 공지사항 <span class="tag" style="background:var(--peach-soft);color:#e0566f">NEW 3</span></h2>
+        <ul class="notice-list">
+          <li class="open">
+            <button><span class="label l-red">중요</span><span><span class="n-title">체육대회 반티 사이즈 조사</span><span class="n-date">10월 17일</span></span></button>
+            <div class="n-body">체육대회(10/30)에 입을 반티 사이즈를 이번 주 금요일까지 단톡방 설문에 꼭 적어 주세요. 색상은 투표 결과 <b>민트색</b>으로 정해졌어요! 💚</div>
+          </li>
+          <li>
+            <button><span class="label l-blue">학습</span><span><span class="n-title">수학 수행평가 안내 (일차함수)</span><span class="n-date">10월 15일</span></span></button>
+            <div class="n-body">다음 주 수요일 3교시에 일차함수 그래프 수행평가가 있어요. 자, 연필, 지우개를 준비하고 교과서 112~125쪽을 복습해 오세요.</div>
+          </li>
+          <li>
+            <button><span class="label l-green">생활</span><span><span class="n-title">교실 환경 미화 모둠 발표</span><span class="n-date">10월 13일</span></span></button>
+            <div class="n-body">가을맞이 교실 꾸미기 담당 모둠은 3모둠이에요. 필요한 재료는 선생님께 미리 말해 주면 준비해 줄게요. 🍁</div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="card teacher" id="teacher">
+        <h2>💌 선생님 한마디</h2>
+        <div class="teacher-head">
+          <div class="avatar">🧑‍🏫</div>
+          <div><b>담임 선생님</b><small>국어 담당 · 2학년 10반</small></div>
+        </div>
+        <div class="bubble" id="teacherMsg">
+          요즘 날씨가 쌀쌀해졌죠? 감기 조심하고, 체육대회 연습도 무리하지 말기!
+          결과보다 우리가 함께 땀 흘린 시간이 더 오래 기억에 남을 거예요.
+          10반, 언제나 응원해요! 🌟
+        </div>
+        <div class="cheer">
+          <button id="cheerBtn">💖 응원 보내기</button>
+          <span id="cheerCount">0명이 응원했어요</span>
+        </div>
+      </section>
+
+    </aside>
+  </div>
+</main>
+
+<footer>
+  ○○중학교 2학년 10반 · 함께 만드는 우리 반 홈페이지 🌱
+</footer>
+
+<script>
+  // ---------- 주간 학습 일정 ----------
+  const days = ['월', '화', '수', '목', '금'];
+  const weeks = [
+    {
+      rows: [
+        ['국어', '수학', '영어', '과학', '체육'],
+        ['수학', '사회', '국어', '영어', '음악'],
+        ['영어', '과학', '수학', '국어', '미술'],
+        ['과학', '체육', '도덕', '수학', '미술'],
+        ['사회', '정보', '체육', '기술가정', '창체'],
+        ['도덕', '국어', '동아리', '사회', '창체'],
+      ],
+      notes: ['📝 수: 영어 단어 시험', '🏃 목: 체육대회 반 연습', '📚 금: 독서 기록장 제출'],
+    },
+    {
+      rows: [
+        ['국어', '수학', '영어', '과학', '체육'],
+        ['수학', '사회', '수학(수행)', '영어', '음악'],
+        ['영어', '과학', '수학', '국어', '미술'],
+        ['과학', '체육', '도덕', '수학', '미술'],
+        ['사회', '정보', '체육', '기술가정', '창체'],
+        ['도덕', '국어', '동아리', '사회', '창체'],
+      ],
+      notes: ['✏️ 수: 수학 수행평가 (일차함수)', '🧪 목: 과학 실험 보고서', '🎉 금: 체육대회 리허설'],
+    },
+  ];
+
+  function mondayOf(offsetWeeks) {
+    const d = new Date();
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1 + offsetWeeks * 7);
+    return d;
+  }
+
+  function renderWeek(w) {
+    const mon = mondayOf(w);
+    const todayIdx = w === 0 ? (new Date().getDay() + 6) % 7 : -1;
+    const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+    document.getElementById('weekLabel').textContent =
+      `${mon.getMonth() + 1}/${mon.getDate()} ~ ${fri.getMonth() + 1}/${fri.getDate()}`;
+
+    let html = '<tr><th></th>' + days.map((d, i) => {
+      const dt = new Date(mon); dt.setDate(mon.getDate() + i);
+      return `<th class="${i === todayIdx ? 'today' : ''}">${d} <small>${dt.getDate()}</small></th>`;
+    }).join('') + '</tr>';
+    weeks[w].rows.forEach((r, p) => {
+      html += `<tr><td class="period">${p + 1}교시</td>` +
+        r.map((s, i) => `<td class="${i === todayIdx ? 'today' : ''}">${s}</td>`).join('') + '</tr>';
+    });
+    document.getElementById('timetable').innerHTML = html;
+    document.getElementById('schNote').innerHTML = weeks[w].notes.map(n => `<span>${n}</span>`).join('');
+  }
+
+  document.getElementById('weekTabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#weekTabs button').forEach(x => x.classList.toggle('on', x === b));
+    renderWeek(+b.dataset.w);
+  });
+  renderWeek(0);
+
+  // ---------- D-day ----------
+  (function () {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const events = [
+      { name: '체육대회', date: new Date(now.getFullYear(), 9, 30) },
+      { name: '2학기 기말고사', date: new Date(now.getFullYear(), 11, 8) },
+      { name: '겨울방학', date: new Date(now.getFullYear(), 11, 31) },
+    ];
+    const next = events.find(e => e.date >= now) || events[events.length - 1];
+    const diff = Math.round((next.date - now) / 86400000);
+    document.getElementById('dday').textContent = diff === 0 ? 'D-DAY' : (diff > 0 ? `D-${diff}` : `D+${-diff}`);
+    document.getElementById('ddayText').textContent = `${next.name}까지 (${next.date.getMonth() + 1}월 ${next.date.getDate()}일)`;
+  })();
+
+  // ---------- 공지사항 펼치기 ----------
+  document.querySelectorAll('.notice-list button').forEach(b => {
+    b.addEventListener('click', () => b.parentElement.classList.toggle('open'));
+  });
+
+  // ---------- 선생님 응원 ----------
+  let cheers = 0;
+  try { cheers = +localStorage.getItem('cheer210') || 0; } catch (e) {}
+  const cheerCount = document.getElementById('cheerCount');
+  cheerCount.textContent = `${cheers}번 응원했어요`;
+  document.getElementById('cheerBtn').addEventListener('click', () => {
+    cheers++;
+    try { localStorage.setItem('cheer210', cheers); } catch (e) {}
+    cheerCount.textContent = `${cheers}번 응원했어요 🎉`;
+  });
+
+  // ---------- 검색: 키워드가 있는 섹션으로 이동 + 강조 ----------
+  document.getElementById('searchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const q = document.getElementById('q').value.trim();
+    const msg = document.getElementById('searchMsg');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('hit'));
+    if (!q) { msg.textContent = ''; return; }
+    // 숨겨진 공지 본문도 검색되도록 textContent 사용
+    const hits = [...document.querySelectorAll('main .card')].filter(c => c.textContent.includes(q));
+    if (!hits.length) { msg.textContent = `"${q}"에 대한 결과가 없어요 😢`; return; }
+    hits.forEach(c => c.classList.add('hit'));
+    document.querySelectorAll('.notice-list li').forEach(li => {
+      if (li.textContent.includes(q)) li.classList.add('open');
+    });
+    msg.textContent = `"${q}" 찾음! ${hits.length}개 섹션에 있어요 ✨`;
+    hits[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ---------- 상단 메뉴 현재 위치 표시 ----------
+  const navLinks = document.querySelectorAll('.nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' });
+  ['intro', 'schedule', 'notice', 'teacher'].forEach(id => obs.observe(document.getElementById(id)));
+</script>
+</body>
+</html>
